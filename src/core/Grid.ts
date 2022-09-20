@@ -1,24 +1,34 @@
-import { Cell, CellState, Grid, GridSize } from './types'
+import { Cell, hidden0 } from './Cell'
 
-export const createEmptyGrid = (
+export type Grid = Cell[][]
+export type GridSize = [number, number]
+export type Coords = [number, number]
+
+export const createDefaultGrid = (
   size: GridSize,
-  state: Cell = CellState.empty
-): Grid => [...Array(size[0])].map(() => Array(size[1]).fill(state))
+  cell: Cell = hidden0()
+): Grid => {
+  const grid = [...Array(size[0])].map(() => {
+    return [...Array(size[1])].map(() => {
+      return { ...cell }
+    })
+  })
+  return grid
+}
 
 export const createGrid = (size: GridSize, mineDensity: number): Grid => {
   if (mineDensity > 1 || mineDensity < 0) {
-    throw new Error('地雷密度必須介於1到0之間')
+    throw new Error('地雷密度必須介於0到1之間')
   }
-  const grid = createEmptyGrid(size)
+  const grid = createDefaultGrid(size)
   const totalCellsNumber = size[0] * size[1]
   let unhandledCellsNumber = totalCellsNumber
   let remainingMinesNumber = Math.round(totalCellsNumber * mineDensity)
-  // let remainingMineDensity = mineDensity
 
   grid.forEach((row) => {
     row.forEach((cell) => {
       if (remainingMinesNumber / unhandledCellsNumber > Math.random()) {
-        cell = CellState.mine
+        cell.minesAround = -1
         remainingMinesNumber--
       }
       unhandledCellsNumber--

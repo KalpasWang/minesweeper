@@ -1,4 +1,4 @@
-import { Grid, Coords } from './types'
+import { Grid, Coords } from './Grid'
 
 export const getNeighboringCells = (
   grid: Grid,
@@ -31,10 +31,14 @@ export const getNeighboringCells = (
 }
 
 export const incrementNeighbiringCells = (grid: Grid, coord: Coords): Grid => {
+  if (grid[coord[0]][coord[1]].minesAround >= 0) {
+    throw new Error('此座標的 cell 不是地雷')
+  }
   const neighbors = getNeighboringCells(grid, coord)
   Object.values(neighbors).forEach(([y, x]: Coords) => {
-    if (grid[y][x] < 8) {
-      grid[y][x]++
+    const cell = grid[y][x]
+    if (cell.minesAround >= 0 && cell.minesAround < 8) {
+      cell.minesAround++
     }
   })
   return grid
